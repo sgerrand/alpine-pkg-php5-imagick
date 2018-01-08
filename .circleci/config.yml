@@ -9,24 +9,70 @@ jobs:
       - run:
           name: Create Docker volumes
           command: |
-            docker create --name input --volume /home/builder/package alpine:3.7 /bin/true
-            docker create --name output --volume /packages alpine:3.7 /bin/true
+            docker create --name input --volume /home/builder/package alpine /bin/true
+            docker create --name output --volume /packages alpine /bin/true
             docker cp ./APKBUILD input:/home/builder/package
       - run:
-          name: Build packages
+          name: Build packages using Alpine 3.5
           command: |
             docker run --env RSA_PRIVATE_KEY="$RSA_PRIVATE_KEY" --env RSA_PRIVATE_KEY_NAME="$CIRCLE_PROJECT_USERNAME.rsa" \
-                       --volumes-from input --volumes-from output $CIRCLE_PROJECT_USERNAME/alpine-abuild:v6
+                       --volumes-from input --volumes-from output $CIRCLE_PROJECT_USERNAME/alpine-abuild:3.5
       - run:
           name: Extract packages
           command: |
-            mkdir -p packages
-            docker cp output:/packages/builder packages/
+            mkdir -p packages/3.5
+            docker cp output:/packages/builder packages/3.5/builder
+            for file in $(find packages/3.5 -name '*.apk'); do newfile=$(echo $file | sed -e 's/\.apk/-3.5.apk/'); mv -v $file $newfile; done
+      - run:
+          name: Remove Docker volumes
+          command: |
+            docker rm input
+            docker rm output
+          when: always
+      - run:
+          name: Create Docker volumes
+          command: |
+            docker create --name input --volume /home/builder/package alpine /bin/true
+            docker create --name output --volume /packages alpine /bin/true
+            docker cp ./APKBUILD input:/home/builder/package
+      - run:
+          name: Build packages using Alpine 3.6
+          command: |
+            docker run --env RSA_PRIVATE_KEY="$RSA_PRIVATE_KEY" --env RSA_PRIVATE_KEY_NAME="$CIRCLE_PROJECT_USERNAME.rsa" \
+                       --volumes-from input --volumes-from output $CIRCLE_PROJECT_USERNAME/alpine-abuild:3.6
+      - run:
+          name: Extract packages
+          command: |
+            mkdir -p packages/3.6
+            docker cp output:/packages/builder packages/3.6/builder
+            for file in $(find packages/3.6 -name '*.apk'); do newfile=$(echo $file | sed -e 's/\.apk/-3.6.apk/'); mv -v $file $newfile; done
+      - run:
+          name: Remove Docker volumes
+          command: |
+            docker rm input
+            docker rm output
+          when: always
+      - run:
+          name: Create Docker volumes
+          command: |
+            docker create --name input --volume /home/builder/package alpine /bin/true
+            docker create --name output --volume /packages alpine /bin/true
+            docker cp ./APKBUILD input:/home/builder/package
+      - run:
+          name: Build packages using Alpine 3.7
+          command: |
+            docker run --env RSA_PRIVATE_KEY="$RSA_PRIVATE_KEY" --env RSA_PRIVATE_KEY_NAME="$CIRCLE_PROJECT_USERNAME.rsa" \
+                       --volumes-from input --volumes-from output $CIRCLE_PROJECT_USERNAME/alpine-abuild:3.7
+      - run:
+          name: Extract packages
+          command: |
+            mkdir -p packages/3.7
+            docker cp output:/packages/builder packages/3.7/builder
       - run:
           name: Test installing packages
           command: |
             cp $CIRCLE_PROJECT_USERNAME.rsa.pub /etc/apk/keys/$CIRCLE_PROJECT_USERNAME.rsa.pub
-            apk add --no-progress --update-cache --upgrade ./packages/builder/x86_64/php5-imagick-*.apk
+            apk add --no-cache --no-progress ./packages/3.7/builder/x86_64/php5-imagick-*.apk
       - run:
           name: Test PHP module
           command: |
@@ -58,7 +104,9 @@ jobs:
           name: Release packages
           command: |
             ghr -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -prerelease -delete unreleased packages
-            ghr -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -prerelease unreleased packages/builder/x86_64
+            ghr -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -prerelease unreleased packages/3.5/builder/x86_64
+            ghr -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -prerelease unreleased packages/3.6/builder/x86_64
+            ghr -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -prerelease unreleased packages/3.7/builder/x86_64
     working_directory: ~/alpine-pkg-php5-imagick
   release-tag:
     docker:
