@@ -5,7 +5,7 @@
 This is the [PHP5 extension for ImageMagick][php-imagick] as an Alpine Linux package.
 
 The package provided by Alpine Linux was removed from their repositories in the
-3.6 release. A package for PHP7 is still available there.
+3.6 release. A package for PHP7 is still [available there](https://pkgs.alpinelinux.org/packages?name=php7-pecl-imagick*).
 
 ## Releases
 
