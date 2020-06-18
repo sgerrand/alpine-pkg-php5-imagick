@@ -11,7 +11,7 @@ jobs:
           command: |
             docker create --name input --volume /home/builder/package alpine:3.7 /bin/true
             docker create --name output --volume /packages alpine:3.7 /bin/true
-            docker create --name test --volume /home/builder/package --volume /etc/apk/keys alpine:3.7 /bin/true
+            docker create --name test --volume /home/builder/package --volume /etc/apk/keys --volume /packages alpine:3.7 /bin/true
             docker cp ./APKBUILD input:/home/builder/package
       - run:
           name: Build packages
