@@ -11,22 +11,28 @@ jobs:
           command: |
             docker create --name input --volume /home/builder/package alpine:3.7 /bin/true
             docker create --name output --volume /packages alpine:3.7 /bin/true
+            docker create --name test --volume /home/builder/package --volume /etc/apk/keys alpine:3.7 /bin/true
             docker cp ./APKBUILD input:/home/builder/package
       - run:
           name: Build packages
           command: |
             docker run --env RSA_PRIVATE_KEY="$RSA_PRIVATE_KEY" --env RSA_PRIVATE_KEY_NAME="$CIRCLE_PROJECT_USERNAME.rsa" \
-                       --volumes-from input --volumes-from output $CIRCLE_PROJECT_USERNAME/alpine-abuild:v6
+                       --volumes-from input --volumes-from output sgerrand/alpine-abuild:3.7
       - run:
           name: Extract packages
           command: |
             mkdir -p packages
             docker cp output:/packages/builder packages/
       - run:
+          name: Copy files
+          command: |
+            docker cp sgerrand.rsa.pub test:/etc/apk/keys/
+            docker cp packages/builder test:/packages/builder
+      - run:
           name: Test installing packages
           command: |
-            cp $CIRCLE_PROJECT_USERNAME.rsa.pub /etc/apk/keys/$CIRCLE_PROJECT_USERNAME.rsa.pub
-            apk add --no-progress --update-cache --upgrade ./packages/builder/x86_64/php5-imagick-*.apk
+            docker run --volumes-from test alpine:3.7 \
+              apk add --no-progress --update-cache --upgrade /packages/builder/x86_64/php5-imagick-*.apk
       - run:
           name: Test PHP module
           command: |
@@ -37,6 +43,7 @@ jobs:
           command: |
             docker rm input
             docker rm output
+            docker rm test
           when: always
       - store_artifacts:
           destination: pkgs
