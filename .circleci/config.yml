@@ -36,8 +36,9 @@ jobs:
       - run:
           name: Test PHP module
           command: |
-             apk add --no-cache --no-progress php5-cli
-             php5 -r '$canvas = new Imagick(); $canvas->newImage(350, 70, "white");'
+            docker run --volumes-from test alpine:3.7 \
+              sh -c 'apk add --no-progress --update-cache --upgrade /packages/builder/x86_64/php5-imagick-*.apk \
+                && php5 -r '"'"'$canvas = new Imagick(); $canvas->newImage(350, 70, "white");'"'"''
       - run:
           name: Remove Docker volumes
           command: |
