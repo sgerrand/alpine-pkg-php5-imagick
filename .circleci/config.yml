@@ -32,7 +32,7 @@ jobs:
           name: Test installing packages
           command: |
             docker run --volumes-from test alpine:3.7 \
-              apk add --no-progress --update-cache --upgrade /packages/builder/x86_64/php5-imagick-*.apk
+              sh -c 'apk add --no-progress --update-cache --upgrade /packages/builder/x86_64/php5-imagick-*.apk'
       - run:
           name: Test PHP module
           command: |
