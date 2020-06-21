@@ -3,8 +3,8 @@
 _php=php5
 pkgname=$_php-imagick
 _pkgrealname=imagick
-pkgver=3.4.3
-pkgrel=1
+pkgver=3.4.4
+pkgrel=0
 _phpver=${pkgname#php}
 _phpver=${_phpver%%-*}
 pkgdesc="PHP$_phpver extension: Provides a wrapper to the ImageMagick library"
@@ -45,4 +45,4 @@ package() {
 	install -Dm644 LICENSE $pkgdir/usr/share/licenses/$pkgname/LICENSE
 }
 
-sha512sums="2cb2b856cf83a78d3542cdf7c69554dcc063a0541e9092b24e5e1fbd8928066a4a3de154049d0202c35addbc5055ccfbb5910ae92f2f13da80ddfc025340ddcd  imagick-3.4.3.tgz"
+sha512sums="73145a1f095849c32760db2dfc4acc13c57d99a037d65eca9b0ddf8f8e81cf6d28a50f2614e44bae1d90b4f881a2e9a64926e0e3b9403e491fd903ffeb30c4b7  imagick-3.4.4.tgz"
