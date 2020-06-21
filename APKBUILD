@@ -4,11 +4,11 @@ _php=php5
 pkgname=$_php-imagick
 _pkgrealname=imagick
 pkgver=3.4.3
-pkgrel=0
+pkgrel=1
 _phpver=${pkgname#php}
 _phpver=${_phpver%%-*}
 pkgdesc="PHP$_phpver extension: Provides a wrapper to the ImageMagick library"
-url="http://pecl.php.net/$_pkgrealname"
+url="https://pecl.php.net/$_pkgrealname"
 arch="all"
 license="PHP"
 depends="php$_phpver-common"
@@ -16,7 +16,7 @@ depends_dev="$_php-dev"
 makedepends="$depends_dev autoconf libtool imagemagick-dev pcre-dev"
 install=""
 subpackages="$pkgname-dev $pkgname-doc"
-source="http://pecl.php.net/get/$_pkgrealname-$pkgver.tgz"
+source="https://pecl.php.net/get/$_pkgrealname-$pkgver.tgz"
 
 builddir="$srcdir"/$_pkgrealname-$pkgver
 
